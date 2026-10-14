@@ -5,7 +5,7 @@
 
 完整教學：[Gemini 串接 LINE Bot 教學：用 GAS 免伺服器做 AI 助理](https://clone-info.net/blog/line-bot-development-gemini-api-gas-tutorial/)
 
-> **這是單人使用的範例。** 四張工作表都沒有記錄是哪個使用者，任何加好友的人都查得到全部行程與備忘，也會收到所有人的提醒。官方帳號請勿讓外人加好友；要給多人使用，需改成依 `userId` 分開資料。
+> **這是單人使用的範例。** 四張工作表都沒有記錄是哪個使用者，任何加好友的人都查得到全部行程與備忘，也會收到所有人的提醒。拿到官方帳號 ID 或 QR code 的人都加得到好友；要擋外人，可在 `handleMessage` 開頭比對自己的 `userId`，不是本人就不處理。要給多人使用，需改成依 `userId` 分開資料。
 
 ## 功能
 
@@ -29,7 +29,7 @@
 ### 1. 準備金鑰
 
 - LINE：自 2024-09-04 起無法在 Developers Console 直接建立 Messaging API channel。先建立 LINE 官方帳號，在 LINE Official Account Manager「設定」→「Messaging API」啟用，再到 [LINE Developers Console](https://developers.line.biz/console/) 的 Messaging API 分頁發行 **Channel access token**
-- 同一分頁把「自動回應訊息」與「加入好友的歡迎訊息」關閉，否則官方帳號的預設回應會再回一次
+- 到 LINE Official Account Manager 的「設定」→「回應設定」，關閉「自動回應訊息」與「加入好友的歡迎訊息」（建立時預設開啟），否則官方帳號的預設回應會再回一次
 - Gemini：在 [Google AI Studio](https://aistudio.google.com/apikey) 建立 **API 金鑰**
 
 ### 2. 建立試算表與 Apps Script
@@ -49,7 +49,7 @@ Apps Script 左側「專案設定」→「指令碼屬性」，新增：
 
 金鑰不要寫進程式碼，也不要提交到任何 repo。
 
-同一頁把**時區**設為「(GMT+08:00) 台北」。只貼 4 個 `.gs` 檔不會帶入 `appsscript.json`，提醒與晨報依這個時區計算。
+同一頁把**時區**設為「(GMT+08:00) 台北」，試算表的「檔案」→「設定」也設為台北。只貼 4 個 `.gs` 檔不會帶入 `appsscript.json`；寫進試算表的時間與提醒、晨報都依時區換算，兩邊不一致時間就會錯位。
 
 ### 4. 建立工作表
 
@@ -81,7 +81,7 @@ Apps Script 左側「專案設定」→「指令碼屬性」，新增：
 
 | 函式 | 事件來源 | 頻率 |
 |---|---|---|
-| `checkReminders` | 時間驅動 | 每 10 分鐘（提醒行程前 30 分鐘內的行程） |
+| `checkReminders` | 時間驅動 | 每 10 分鐘（提醒 30 分鐘內開始的行程） |
 | `dailyReport` | 時間驅動 | 每天早上，例如 7–8 點 |
 | `weeklyReport` | 時間驅動 | 每週一早上 |
 
